@@ -1,0 +1,14 @@
+import yfinance as yf
+import numpy as np
+from sllearn.linear_model import LinearRegression
+symbols = ['ONGC', 'NIFTY']
+data = yf.download(symbols, '2021-9-7')['Adj Close']
+
+price_change = data.pct_change()
+df = price_change.drop(price_change.index[0])
+
+x = np.array(df['ONGC'].reshape((-1,1))
+y = np.array(df['NIFTY']
+model = LinearRegression().fit(x,y)
+
+print('Beta= ', model.coef_)

@@ -1,0 +1,23 @@
+from datetime import date
+import pandas as pd
+from jugaad_data.nse import undex_df, stock_df
+idx = index_df("NIFTY50", date(2020,1,1), date(2020,6,1))
+stk = stock_df("RELIANCE", date(2020,1,1), date(2020,6,1))
+print(idx.head())
+print(stk.head())
+idx['DATE'] = idx['HistoricalDate']
+df = idx[["Date", 'Close']]
+df.columns = ['DATE', "NIFTY"]
+df = pd.merge(df, stk[['DATE', 'CLOSE']], how ='inner', on ='Date')
+df.columns = ['DATE', 'NIFTY', 'STK']
+df['STK_PREV'] = df['STK'].shift(1)
+df['NIFTY_PREV'] = df['NIFTY'].shift(1)
+df['NIFTY_CHG'] = (df['NIFTY']-df['NIFTY_PREV'])/df['NIFTY_PREV']
+df['STK_CHG'] = (df['STK']-df['STK_PREV'])/df['STK_PREV']
+df.dropna(inplace=True)
+print(df.head())
+import numpy as np
+cov = np.cov(df['STK_CHG'], df['NIFTY_CHG'])
+var = np.var(df['NIFTY_CHG'])
+print(cov)
+print(cov[1,0]/var)
